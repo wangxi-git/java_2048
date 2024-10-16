@@ -6,6 +6,8 @@ import game2048rendering.Tile;
 
 import java.util.Formatter;
 
+import org.checkerframework.checker.units.qual.s;
+
 
 /** The state of a game of 2048.
  *  @author P. N. Hilfinger + Josh Hug
@@ -84,7 +86,22 @@ public class Model {
      *  Empty spaces are stored as null.
      * */
     public boolean emptySpaceExists() {
-        return false;
+        int x = 0,y =0;
+        int size = size();
+        if(score ==0)
+        {
+            for(;x<size;x++)
+            {
+                for(;y<size;y++)
+                {
+                    if(this.board.tile(x, y) != null)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -93,6 +110,18 @@ public class Model {
      * given a Tile object t, we get its value with t.value().
      */
     public boolean maxTileExists() {
+        int x = 0,y = 0;
+        int size = size();
+        for(;x<size;x++)
+        {
+            for(;y<size;y++)
+            {
+               Tile t = board.tile(x, y);
+                if (t != null && t.value()== MAX_PIECE) 
+                    return true;
+
+            }
+        }
         return false;
     }
 
@@ -104,6 +133,57 @@ public class Model {
      */
     public boolean atLeastOneMoveExists() {
         // TODO: Fill in this function.
+        int x=0,y=0;
+        int size = board.size();
+        if(emptySpaceExists())
+        {
+            return true;
+        }
+
+        //中间块
+        for(x=1;x<size-1;x++)
+        {
+            for(y=1;y<size;y++)
+            {
+                Tile T = board.tile(x, y);
+                Tile Tright = board.tile(x+1, y);
+                Tile Tleft = board.tile(x-1, y);
+                Tile Tup = board.tile(x, y+1);
+                Tile Tdown = board.tile(x, y-1);
+                if(T.value()== Tright.value()||
+                T.value()== Tleft.value() ||
+                T.value()== Tup.value() ||
+                T.value()== Tdown.value()
+                ) return true;
+            }
+        }
+
+        //下侧
+        for(x =0;x<size-2;x++)
+        {
+            if(board.tile(x, 0).value() ==board.tile(x+1, y).value())
+            {
+                return true;
+            }
+        }
+        //上侧
+        for (x = 0; x < size - 2; x++) {
+            if (board.tile(x, size-1).value() == board.tile(x + 1, size-1).value()) {
+                return true;
+            }
+        }
+        //左侧
+        for(y=0;y<size-2;y++)
+        {
+            if (board.tile(size-1, y).value() == board.tile(size-1,y).value()) {
+                return true;
+        }}
+        //右侧
+        for(y=0;y<size-2;y++)
+        {
+            if (board.tile(0, y).value() == board.tile(0,y).value()) {
+                return true;}
+        }
         return false;
     }
 
@@ -126,6 +206,64 @@ public class Model {
         int myValue = currTile.value();
         int targetY = y;
 
+        int size = board.size();
+
+        // 找到第一个不为空的方块
+
+        // 记录上移的次数
+        int count = 0;
+
+        // 要移动的格子已经在最顶，不用处理移动不了
+        if (y == size - 1) {
+            return;
+        }
+        // 用来判断是否一直是为空格子
+        boolean isNull = true;
+        for (targetY = y + 1; targetY < size; targetY++) {
+            // 找到第一个不为空的块
+            count++;
+            if (board.tile(x, targetY) != null) {
+                isNull = false;
+                break;
+            }
+        }
+
+        // 表示移动的格子数为1，则表示下一个移动的格子不为空
+        if (count == 1) {
+
+            if (isNull) {
+                board.move(x, y + count, currTile);
+                return;
+            } else {
+                if (board.tile(x, y + count).value() == myValue && !board.tile(x, y + count).wasMerged()) {
+
+                    board.move(x, y + count, currTile);
+                    this.score += board.tile(x, y + count).value();
+                } else {
+                    return;
+                }
+            }
+
+        }
+
+        // 移动的次数不为0，表示可以移动
+        else {
+            if (isNull) {
+                board.move(x, y + count, currTile);
+                return;
+            } else {
+                if (board.tile(x, y + count).value() == myValue && !board.tile(x, y + count).wasMerged()) {
+
+                    board.move(x, y + count, currTile);
+                    this.score += board.tile(x, y + count).value();
+                } else {
+                    // if (y + count == size - 1 ) {
+
+                    // }
+                    board.move(x, y + count - 1, currTile);
+                }
+            }
+        }
     }
 
     /** Handles the movements of the tilt in column x of the board
