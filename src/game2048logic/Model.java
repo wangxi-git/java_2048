@@ -84,7 +84,22 @@ public class Model {
      *  Empty spaces are stored as null.
      * */
     public boolean emptySpaceExists() {
-        return false;
+        int x = 0,y =0;
+        int size = size();
+        if(score ==0)
+        {
+            for(;x<size;x++)
+            {
+                for(;y<size;y++)
+                {
+                    if(this.board.tile(x, y) != null)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -93,6 +108,18 @@ public class Model {
      * given a Tile object t, we get its value with t.value().
      */
     public boolean maxTileExists() {
+        int x = 0,y = 0;
+        int size = size();
+        for(;x<size;x++)
+        {
+            for(;y<size;y++)
+            {
+               Tile t = board.tile(x, y);
+                if (t != null && t.value()== MAX_PIECE) 
+                    return true;
+
+            }
+        }
         return false;
     }
 
